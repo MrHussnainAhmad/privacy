@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import "easymde/dist/easymde.min.css";
-import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), { ssr: false });
@@ -15,7 +14,7 @@ export default function ProjectEditor() {
     const isNew = id === "new";
 
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!isNew);
     const [saving, setSaving] = useState(false);
 
     const [project, setProject] = useState({
@@ -33,34 +32,24 @@ export default function ProjectEditor() {
     }, []);
 
     useEffect(() => {
-        if (!id) return;
+        if (!id || id === "new") return;
 
-        if (id === "new") {
-            setLoading(false);
-            return;
-        }
-
-        // Only fetch if we haven't loaded yet to prevent re-fetching/re-rendering loops
-        // But since we have isNew check, it's fine.
-
-        if (!isNew) {
-            fetch(`/api/projects/${id}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    if (data.error) {
-                        alert("Project not found");
-                        router.push("/admin");
-                    } else {
-                        setProject(data);
-                        setLoading(false);
-                    }
-                })
-                .catch(() => {
-                    alert("Error fetching project");
+        fetch(`/api/projects/${id}`)
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.error) {
+                    alert("Project not found");
                     router.push("/admin");
-                });
-        }
-    }, [id, isNew, router]);
+                } else {
+                    setProject(data);
+                    setLoading(false);
+                }
+            })
+            .catch(() => {
+                alert("Error fetching project");
+                router.push("/admin");
+            });
+    }, [id, router]);
 
     const handleSave = async () => {
         if (!project.projectName || !project.slug) {
@@ -88,6 +77,7 @@ export default function ProjectEditor() {
                 router.push("/admin");
             }
         } catch (err) {
+            console.error("Save error:", err);
             setSaving(false);
             alert("Failed to save");
         }

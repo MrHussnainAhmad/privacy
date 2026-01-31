@@ -13,8 +13,15 @@ export default async function AdminDashboard() {
     }
 
     await dbConnect();
-    // Ensure types are handled by mongoose/Next.js
-    const projects = await Project.find({}).sort({ updatedAt: -1 }).lean();
+    const rawProjects = await Project.find({}).sort({ updatedAt: -1 }).lean();
+    
+    // Convert to plain objects with string IDs for the client-side/rendering safety
+    const projects = rawProjects.map(p => ({
+        ...p,
+        _id: p._id.toString(),
+        updatedAt: p.updatedAt.toISOString(),
+        createdAt: p.createdAt.toISOString()
+    }));
 
     return (
         <div className="min-h-screen bg-gray-50 p-8">
@@ -44,14 +51,14 @@ export default async function AdminDashboard() {
                 <div className="mt-12">
                     <h2 className="mb-6 text-xl font-semibold text-gray-900">Recent Projects</h2>
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {projects.map((project: any) => (
-                            <div key={project._id.toString()} className="group relative rounded-xl bg-white p-6 shadow-sm border border-gray-100 hover:shadow-md transition">
+                        {projects.map((project) => (
+                            <div key={project._id} className="group relative rounded-xl bg-white p-6 shadow-sm border border-gray-100 hover:shadow-md transition">
                                 <div className="flex items-start justify-between">
                                     <div>
                                         <h3 className="font-semibold text-gray-900">{project.projectName}</h3>
                                         <p className="text-sm text-gray-500">/{project.slug}</p>
                                     </div>
-                                    <Link href={`/admin/projects/${project._id.toString()}`} className="text-gray-400 hover:text-blue-600">
+                                    <Link href={`/admin/projects/${project._id}`} className="text-gray-400 hover:text-blue-600">
                                         <FileText size={20} />
                                     </Link>
                                 </div>
@@ -60,7 +67,7 @@ export default async function AdminDashboard() {
                                     <span>Updated {new Date(project.updatedAt).toLocaleDateString()}</span>
                                 </div>
                                 <div className="mt-4 flex gap-2">
-                                    <Link href={`/admin/projects/${project._id.toString()}`} className="text-sm text-blue-600 hover:underline">Edit</Link>
+                                    <Link href={`/admin/projects/${project._id}`} className="text-sm text-blue-600 hover:underline">Edit</Link>
                                     <a href={`/privacy/${project.slug}`} target="_blank" className="text-sm text-gray-600 hover:underline">View Public</a>
                                 </div>
                             </div>

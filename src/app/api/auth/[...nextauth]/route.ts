@@ -25,7 +25,7 @@ export const authOptions: AuthOptions = {
                 if (!isValid) {
                     throw new Error("Invalid password");
                 }
-                return { id: (user as any)._id.toString(), email: user.email };
+                return { id: (user as { _id: { toString(): string } })._id.toString(), email: user.email };
             }
         })
     ],
@@ -44,7 +44,7 @@ export const authOptions: AuthOptions = {
         },
         async session({ session, token }) {
             if (session.user) {
-                (session.user as any).id = token.id as string;
+                session.user.id = token.id as string;
             }
             return session;
         }

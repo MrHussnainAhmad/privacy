@@ -27,6 +27,7 @@ export async function POST(req: Request) {
         const project = await Project.create(body);
         return NextResponse.json(project);
     } catch (err) {
+        console.error("Error creating project:", err);
         return NextResponse.json({ error: "Failed to create project" }, { status: 500 });
     }
 }

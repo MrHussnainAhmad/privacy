@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/db";
-import Project from "@/models/Project";
+import Project, { IProject } from "@/models/Project";
 import ReactMarkdown from "react-markdown";
 import { notFound } from "next/navigation";
 import { Metadata } from 'next';
@@ -11,7 +11,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
     await dbConnect();
-    const project = await Project.findOne({ slug }).lean();
+    const project = await Project.findOne({ slug }).lean() as unknown as IProject;
 
     if (!project) {
         return {
@@ -19,7 +19,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         };
     }
 
-    // @ts-ignore
     const name = project.projectName;
     return {
         title: `${name} - Privacy Policy`,
@@ -30,13 +29,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PrivacyPolicyPage({ params }: Props) {
     const { slug } = await params;
     await dbConnect();
-    const project = await Project.findOne({ slug }).lean();
+    const project = await Project.findOne({ slug }).lean() as unknown as IProject;
 
     if (!project) {
         notFound();
     }
 
-    // @ts-ignore
     const { projectName, privacyPolicyContent, updatedAt } = project;
 
     return (
