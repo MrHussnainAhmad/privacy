@@ -16,7 +16,7 @@ interface ProjectsGridProps {
 
 export default function ProjectsGrid({ projects }: ProjectsGridProps) {
   const [showAll, setShowAll] = useState(false);
-  const initialCount = 4;
+  const initialCount = 3;
 
   const visibleProjects = useMemo(() => {
     if (showAll) {
