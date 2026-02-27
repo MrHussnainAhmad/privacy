@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Mail, Linkedin, Gamepad2, Smartphone, Globe, ArrowUpRight, CheckCircle2 } from "lucide-react";
+import { Mail, Linkedin, Gamepad2, Smartphone, Globe, CheckCircle2 } from "lucide-react";
 import dbConnect from "@/lib/db";
 import Project from "@/models/Project";
+import ProjectsGrid from "@/components/ProjectsGrid";
 
 // Define the Project type for TypeScript
 interface IProjectDoc {
@@ -142,38 +143,10 @@ export default async function Home() {
                     </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {projects.length > 0 ? (
-                        projects.map((project) => (
-                            <Link 
-                                key={project._id.toString()} 
-                                href={`/privacy/${project.slug}`}
-                                className="group flex flex-col bg-slate-50 rounded-2xl overflow-hidden hover:bg-white border border-slate-200 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300"
-                            >
-                                <div className="h-48 bg-slate-200/50 flex items-center justify-center relative overflow-hidden">
-                                     {/* Pattern Overlay */}
-                                     <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#475569 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
-                                     <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-slate-400 group-hover:scale-110 group-hover:text-blue-600 transition-all duration-300">
-                                        <Smartphone size={32} />
-                                     </div>
-                                </div>
-                                <div className="p-8 flex-1 flex flex-col">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                                            {project.projectName}
-                                        </h3>
-                                        <ArrowUpRight size={20} className="text-slate-300 group-hover:text-blue-600 transition-colors" />
-                                    </div>
-                                    <p className="text-slate-500 text-sm mb-6 line-clamp-2 flex-1">
-                                        Review the privacy policy and details for this application.
-                                    </p>
-                                    <div className="pt-6 border-t border-slate-200/60 mt-auto flex items-center text-xs font-semibold text-slate-400 uppercase tracking-wider group-hover:text-blue-600 transition-colors">
-                                        Read Policy
-                                    </div>
-                                </div>
-                            </Link>
-                        ))
-                    ) : (
+                {projects.length > 0 ? (
+                    <ProjectsGrid projects={projects} />
+                ) : (
+                    <div className="grid">
                         <div className="col-span-full py-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center">
                             <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-4">
                                 <Smartphone size={32} />
@@ -181,8 +154,8 @@ export default async function Home() {
                             <h3 className="text-lg font-semibold text-slate-900">No Projects Yet</h3>
                             <p className="text-slate-500 max-w-sm mt-2">Projects added via the admin dashboard will appear here automatically.</p>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         </section>
 
