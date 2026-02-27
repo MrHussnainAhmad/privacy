@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const router = useRouter();
@@ -14,7 +13,6 @@ export default function LoginPage() {
         e.preventDefault();
         const result = await signIn("credentials", {
             redirect: false,
-            email,
             password,
         });
 
@@ -31,16 +29,6 @@ export default function LoginPage() {
                 <h1 className="mb-6 text-center text-2xl font-bold text-gray-800">Admin Login</h1>
                 {error && <p className="mb-4 text-center text-red-500">{error}</p>}
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-black">Email</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-black shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            required
-                        />
-                    </div>
                     <div>
                         <label className="block text-sm font-medium text-black">Password</label>
                         <input

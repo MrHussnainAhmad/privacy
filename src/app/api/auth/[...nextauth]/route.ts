@@ -9,17 +9,16 @@ export const authOptions: AuthOptions = {
         CredentialsProvider({
             name: "Credentials",
             credentials: {
-                email: { label: "Email", type: "email" },
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) {
+                if (!credentials?.password) {
                     throw new Error("Invalid credentials");
                 }
                 await dbConnect();
-                const user = await User.findOne({ email: credentials.email }) as IUser;
+                const user = await User.findOne({}) as IUser;
                 if (!user) {
-                    throw new Error("User not found");
+                    throw new Error("Admin not seeded");
                 }
                 const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
                 if (!isValid) {

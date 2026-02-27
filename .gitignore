@@ -42,4 +42,5 @@ next-env.d.ts
 
 # scripts
 scripts/seed-admin.ts
+scripts/seed-admin.js
 scripts/*.ts
