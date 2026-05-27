@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
@@ -14,6 +15,7 @@ export default function LoginPage() {
         e.preventDefault();
         const result = await signIn("credentials", {
             redirect: false,
+            email,
             password,
         });
 
@@ -41,6 +43,18 @@ export default function LoginPage() {
                         {error && <p className="mb-4 rounded-lg bg-red-50 px-4 py-2 text-center text-sm text-red-600">{error}</p>}
                         <form onSubmit={handleSubmit} className="space-y-5">
                             <div>
+                                <label className="block text-sm font-medium text-slate-700">Admin Email</label>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="mt-2 block w-full rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-slate-900 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                                    placeholder="you@example.com"
+                                    autoComplete="username"
+                                    required
+                                />
+                            </div>
+                            <div>
                                 <label className="block text-sm font-medium text-slate-700">Password</label>
                                 <div className="relative mt-2">
                                     <input
@@ -48,6 +62,7 @@ export default function LoginPage() {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         className="block w-full rounded-xl border border-slate-200 bg-white/90 px-4 py-3 pr-12 text-slate-900 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                                        autoComplete="current-password"
                                         required
                                     />
                                     <button
