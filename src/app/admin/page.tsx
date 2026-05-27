@@ -2,7 +2,7 @@ import Link from "next/link";
 import dbConnect from "@/lib/db";
 import Project from "@/models/Project";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { PlusCircle, FileText, Clock } from "lucide-react";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
