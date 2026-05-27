@@ -14,8 +14,13 @@ interface IProjectDoc {
 
 async function getProjects() {
   await dbConnect();
-  const projects = await Project.find({}).sort({ createdAt: -1 }).lean();
-  return projects as unknown as IProjectDoc[];
+  const rawProjects = await Project.find({}).sort({ createdAt: -1 }).lean();
+  return rawProjects.map((project) => ({
+    _id: project._id.toString(),
+    projectName: project.projectName,
+    slug: project.slug,
+    privacyPolicyContent: project.privacyPolicyContent,
+  })) as IProjectDoc[];
 }
 
 export default async function Home() {
@@ -65,9 +70,14 @@ export default async function Home() {
                         <Link href="#contact" className="px-8 py-4 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 hover:shadow-blue-300 hover:-translate-y-0.5 text-center">
                             Let&apos;s Collaborate
                         </Link>
-                        <Link href="#projects" className="px-8 py-4 rounded-xl bg-white text-slate-700 font-semibold border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all shadow-sm hover:shadow-md text-center">
+                        <a
+                            href="https://hussnainahmad.vercel.app/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-8 py-4 rounded-xl bg-white text-slate-700 font-semibold border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all shadow-sm hover:shadow-md text-center"
+                        >
                             View Portfolio
-                        </Link>
+                        </a>
                     </div>
 
                     <div className="pt-8 border-t border-slate-200 flex flex-col gap-2">
@@ -221,7 +231,18 @@ export default async function Home() {
                 </div>
 
                 <div className="mt-20 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-slate-500 text-sm">
-                    <p>&copy; {new Date().getFullYear()} Hussnain Ahmad. All rights reserved.</p>
+                    <p>
+                        &copy; {new Date().getFullYear()}{" "}
+                        <a
+                            href="https://hussnainahmad.vercel.app/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-white underline underline-offset-2 transition-colors"
+                        >
+                            Hussnain Ahmad
+                        </a>
+                        . All rights reserved.
+                    </p>
                     <div className="mt-4 md:mt-0">
                         Made with Next.js & Tailwind CSS
                     </div>

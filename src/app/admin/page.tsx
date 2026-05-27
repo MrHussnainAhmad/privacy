@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { PlusCircle, FileText, Clock } from "lucide-react";
+import AdminLogoutButton from "@/components/AdminLogoutButton";
 
 export default async function AdminDashboard() {
     const session = await getServerSession(authOptions);
@@ -30,6 +31,7 @@ export default async function AdminDashboard() {
                     <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
                     <div className="flex gap-4">
                         <span className="self-center text-gray-600">Welcome, {session.user?.email}</span>
+                        <AdminLogoutButton />
                         <Link
                             href="/admin/projects/new"
                             className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition"
