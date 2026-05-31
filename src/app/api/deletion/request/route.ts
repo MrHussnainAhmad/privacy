@@ -22,7 +22,8 @@ export async function POST(req: NextRequest) {
     const requestId = createRequestId();
     const token = createVerificationToken();
     const tokenHash = hashToken(token);
-    const expiresMinutes = 20;
+    const configuredTtl = Number(process.env.DELETION_VERIFY_TOKEN_TTL_MINUTES || "120");
+    const expiresMinutes = Number.isFinite(configuredTtl) && configuredTtl > 0 ? configuredTtl : 120;
     const expiresAt = new Date(Date.now() + expiresMinutes * 60 * 1000);
 
     const deletionRequest = await DeletionRequest.create({
@@ -95,6 +96,7 @@ export async function POST(req: NextRequest) {
             mode: "verification_then_api",
             emailSent,
             reason: emailReason,
+            expiresMinutes,
             emailMeta,
             fallbackVerifyLink: emailSent ? null : verifyLink,
           }
