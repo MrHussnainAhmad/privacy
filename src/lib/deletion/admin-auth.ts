@@ -12,7 +12,17 @@ export async function requireAdmin() {
 
 export function verifySameOrigin(req: NextRequest) {
   const origin = req.headers.get("origin");
+  if (!origin) return true;
+
+  const runtimeOrigin = req.nextUrl.origin;
+  if (origin === runtimeOrigin) return true;
+
   const expected = process.env.NEXTAUTH_URL;
-  if (!origin || !expected) return true;
-  return origin === expected;
+  if (!expected) return false;
+
+  try {
+    return origin === new URL(expected).origin;
+  } catch {
+    return origin === expected;
+  }
 }

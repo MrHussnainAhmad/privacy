@@ -153,7 +153,12 @@ export default function DeleteAccountRequestsPage() {
   async function deleteApp(id?: string) {
     if (!id) return;
     if (!confirm("Delete this app configuration?")) return;
-    await fetch(`/api/admin/deletion-apps/${id}`, { method: "DELETE" });
+    const res = await fetch(`/api/admin/deletion-apps/${id}`, { method: "DELETE" });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      alert(data.message || "Failed to delete app");
+      return;
+    }
     await loadAll();
   }
 

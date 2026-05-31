@@ -54,7 +54,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const { id } = await params;
   await dbConnect();
 
-  const app = await DeletionApp.findByIdAndDelete(id);
+  const objectIdPattern = /^[a-fA-F0-9]{24}$/;
+  const app = objectIdPattern.test(id)
+    ? await DeletionApp.findByIdAndDelete(id)
+    : await DeletionApp.findOneAndDelete({ appId: id });
   if (!app) return NextResponse.json({ success: false, message: "Not found" }, { status: 404 });
 
   await AuditLog.create({
