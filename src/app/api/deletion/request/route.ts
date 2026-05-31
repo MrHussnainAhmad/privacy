@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
     const verifyLink = `${appUrl}/request-data-deletion/verify?rid=${encodeURIComponent(requestId)}&token=${encodeURIComponent(token)}`;
     let emailSent = false;
     let emailReason = "unknown";
+    let emailMeta: Record<string, unknown> | null = null;
 
     try {
       const emailResult = await sendDeletionVerificationEmail({
@@ -51,17 +52,30 @@ export async function POST(req: NextRequest) {
 
       if (!emailResult.sent) {
         emailReason = emailResult.reason || "not_sent";
+        emailMeta = {
+          smtpHost: (emailResult as { smtpHost?: string }).smtpHost || null,
+          from: (emailResult as { from?: string }).from || null,
+        };
         console.warn(
           `[Deletion Email] trace=${traceId} requestId=${requestId} EMAIL_SENT=false reason=${emailResult.reason} fallback=${verifyLink}`
         );
       } else {
         emailSent = true;
         emailReason = "sent";
+        emailMeta = {
+          messageId: (emailResult as { messageId?: string | null }).messageId || null,
+          accepted: (emailResult as { accepted?: unknown[] }).accepted || [],
+          rejected: (emailResult as { rejected?: unknown[] }).rejected || [],
+          response: (emailResult as { response?: string }).response || "",
+          smtpHost: (emailResult as { smtpHost?: string }).smtpHost || null,
+          from: (emailResult as { from?: string }).from || null,
+        };
         console.info(`[Deletion Email] trace=${traceId} requestId=${requestId} EMAIL_SENT=true to=${email}`);
       }
     } catch (emailError) {
       const msg = emailError instanceof Error ? emailError.message : "unknown_error";
       emailReason = msg;
+      emailMeta = { error: msg };
       console.error(`[Deletion Email] trace=${traceId} requestId=${requestId} EMAIL_SENT=false reason=${msg}`);
       console.log(`[Deletion Verify Link Fallback] trace=${traceId} requestId=${requestId} link=${verifyLink}`);
     }
@@ -81,6 +95,7 @@ export async function POST(req: NextRequest) {
             mode: "verification_then_api",
             emailSent,
             reason: emailReason,
+            emailMeta,
             fallbackVerifyLink: emailSent ? null : verifyLink,
           }
         : undefined,

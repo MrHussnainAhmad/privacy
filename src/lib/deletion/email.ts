@@ -100,7 +100,7 @@ export async function sendDeletionVerificationEmail(params: {
     </div>
   `;
 
-  await transporter.sendMail({
+  const info = await transporter.sendMail({
     from: config.from,
     to: params.to,
     subject,
@@ -108,5 +108,13 @@ export async function sendDeletionVerificationEmail(params: {
     html,
   });
 
-  return { sent: true };
+  return {
+    sent: true,
+    messageId: info.messageId || null,
+    accepted: Array.isArray(info.accepted) ? info.accepted : [],
+    rejected: Array.isArray(info.rejected) ? info.rejected : [],
+    response: typeof info.response === "string" ? info.response : "",
+    smtpHost: config.host,
+    from: config.from,
+  };
 }
