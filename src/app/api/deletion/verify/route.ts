@@ -36,6 +36,15 @@ export async function POST(req: NextRequest) {
     await request.save();
 
     const result = await processDeletionRequest(request.requestId);
+    if (!result.success) {
+      const latest = await DeletionRequest.findOne({ requestId: request.requestId }).lean();
+      const failureReason = latest?.error || "Unknown failure";
+      return NextResponse.json({
+        ...result,
+        reason: failureReason,
+      });
+    }
+
     return NextResponse.json(result);
   } catch {
     return NextResponse.json({ success: false, status: "failed", message: "Could not verify request" }, { status: 500 });
