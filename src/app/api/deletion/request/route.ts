@@ -6,6 +6,7 @@ import { checkRateLimit } from "@/lib/deletion/rate-limit";
 import { createRequestId, createVerificationToken, hashToken, maskEmail } from "@/lib/deletion/token";
 import { validateDeletionPayload } from "@/lib/deletion/validation";
 import { processDeletionRequest } from "@/lib/deletion/orchestrator";
+import { sendDeletionVerificationEmail } from "@/lib/deletion/email";
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
@@ -27,7 +28,8 @@ export async function POST(req: NextRequest) {
     const requestId = createRequestId();
     const token = createVerificationToken();
     const tokenHash = hashToken(token);
-    const expiresAt = new Date(Date.now() + 20 * 60 * 1000);
+    const expiresMinutes = 20;
+    const expiresAt = new Date(Date.now() + expiresMinutes * 60 * 1000);
 
     const deletionRequest = await DeletionRequest.create({
       requestId,
@@ -44,7 +46,23 @@ export async function POST(req: NextRequest) {
     } else {
       const appUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
       const verifyLink = `${appUrl}/request-data-deletion/verify?rid=${encodeURIComponent(requestId)}&token=${encodeURIComponent(token)}`;
-      console.log(`[Deletion Verify Link] ${verifyLink}`);
+
+      try {
+        const emailResult = await sendDeletionVerificationEmail({
+          to: email,
+          appId,
+          requestId,
+          verifyLink,
+          expiresMinutes,
+        });
+
+        if (!emailResult.sent) {
+          console.warn(`[Deletion Email] SMTP unavailable (${emailResult.reason}). Fallback verify link for ${requestId}: ${verifyLink}`);
+        }
+      } catch (emailError) {
+        console.error(`[Deletion Email] failed for ${requestId}:`, emailError);
+        console.log(`[Deletion Verify Link Fallback] ${verifyLink}`);
+      }
     }
 
     return NextResponse.json({
