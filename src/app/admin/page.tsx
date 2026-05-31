@@ -31,6 +31,12 @@ export default async function AdminDashboard() {
                     <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
                     <div className="flex gap-4">
                         <span className="self-center text-gray-600">Welcome, {session.user?.email}</span>
+                        <Link
+                            href="/deleteaccountrequests"
+                            className="self-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
+                        >
+                            Deletion Requests
+                        </Link>
                         <AdminLogoutButton />
                         <Link
                             href="/admin/projects/new"

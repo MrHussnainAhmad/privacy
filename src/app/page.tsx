@@ -138,6 +138,27 @@ export default async function Home() {
             </div>
         </section>
 
+        {/* Data Deletion Section */}
+        <section className="border-t border-slate-100 bg-gradient-to-b from-slate-50 to-white py-20">
+            <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 px-6 lg:flex-row lg:items-center lg:px-12">
+                <div className="max-w-3xl">
+                    <p className="text-sm font-semibold uppercase tracking-wider text-blue-600">User Rights</p>
+                    <h2 className="mt-3 text-3xl font-bold text-slate-900 md:text-4xl">Request Account/Data Deletion</h2>
+                    <p className="mt-4 text-lg text-slate-600">
+                        Need your account data removed from one of our apps? Submit a secure deletion request with your account email and track it with a reference ID.
+                    </p>
+                </div>
+                <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+                    <Link
+                        href="/request-data-deletion"
+                        className="rounded-xl bg-blue-600 px-6 py-3 text-center font-semibold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700"
+                    >
+                        Request Data Deletion
+                    </Link>
+                </div>
+            </div>
+        </section>
+
         {/* Projects Section */}
         <section id="projects" className="py-24 bg-white border-t border-slate-100">
             <div className="max-w-7xl mx-auto px-6 lg:px-12">
