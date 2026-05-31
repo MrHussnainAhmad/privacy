@@ -8,6 +8,7 @@ import { processDeletionRequest } from "@/lib/deletion/orchestrator";
 import { sendDeletionVerificationEmail } from "@/lib/deletion/email";
 
 export async function POST(req: NextRequest) {
+  const traceId = crypto.randomUUID();
   try {
     const body = await req.json();
     const { appId, email } = validateDeletionPayload(body as Record<string, unknown>);
@@ -35,6 +36,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (app.deletionMode === "direct_api") {
+      console.info(`[Deletion Request] trace=${traceId} requestId=${deletionRequest.requestId} mode=direct_api action=process_immediately`);
       void processDeletionRequest(deletionRequest.requestId);
     } else {
       const appUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
@@ -50,21 +52,31 @@ export async function POST(req: NextRequest) {
         });
 
         if (!emailResult.sent) {
-          console.warn(`[Deletion Email] SMTP unavailable (${emailResult.reason}). Fallback verify link for ${requestId}: ${verifyLink}`);
+          console.warn(
+            `[Deletion Email] trace=${traceId} requestId=${requestId} EMAIL_SENT=false reason=${emailResult.reason} fallback=${verifyLink}`
+          );
+        } else {
+          console.info(`[Deletion Email] trace=${traceId} requestId=${requestId} EMAIL_SENT=true to=${email}`);
         }
       } catch (emailError) {
-        console.error(`[Deletion Email] failed for ${requestId}:`, emailError);
-        console.log(`[Deletion Verify Link Fallback] ${verifyLink}`);
+        const msg = emailError instanceof Error ? emailError.message : "unknown_error";
+        console.error(`[Deletion Email] trace=${traceId} requestId=${requestId} EMAIL_SENT=false reason=${msg}`);
+        console.log(`[Deletion Verify Link Fallback] trace=${traceId} requestId=${requestId} link=${verifyLink}`);
       }
     }
 
+    console.info(
+      `[Deletion Request] trace=${traceId} requestId=${requestId} appId=${appId} status=${deletionRequest.status} accepted=true`
+    );
     return NextResponse.json({
       success: true,
       status: deletionRequest.status,
       referenceId: requestId,
       message: "If this account exists, we sent verification instructions.",
     });
-  } catch {
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "unknown_error";
+    console.error(`[Deletion Request] trace=${traceId} accepted=false reason=${msg}`);
     return NextResponse.json({ success: true, status: "pending_verification", message: "If this account exists, we sent verification instructions." });
   }
 }
