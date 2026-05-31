@@ -12,6 +12,7 @@ export default function RequestDataDeletionPage() {
   const [referenceId, setReferenceId] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     fetch("/api/deletion/apps")
@@ -27,14 +28,18 @@ export default function RequestDataDeletionPage() {
     e.preventDefault();
     setLoading(true);
     setReferenceId("");
+    setDebugInfo(null);
 
     const res = await fetch("/api/deletion/request", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ appId, email, website: "" }),
+      body: JSON.stringify({ appId, email, website: "", debug: true }),
     });
 
     const data = await res.json();
+    // Browser-visible debug output for quick testing without Vercel dashboard
+    console.log("[Deletion Debug]", data.debug || null);
+    if (data.debug) setDebugInfo(data.debug as Record<string, unknown>);
     setMessage(data.message || "If this account exists, we sent verification instructions.");
     if (data.referenceId) setReferenceId(data.referenceId);
     setLoading(false);
@@ -90,6 +95,13 @@ export default function RequestDataDeletionPage() {
             <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900">
               <p>{message}</p>
               {referenceId && <p className="mt-2 text-sm font-semibold">Reference ID: {referenceId}</p>}
+            </div>
+          )}
+
+          {debugInfo && (
+            <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-blue-900">
+              <p className="text-sm font-semibold">Debug (browser-visible)</p>
+              <pre className="mt-2 overflow-x-auto text-xs">{JSON.stringify(debugInfo, null, 2)}</pre>
             </div>
           )}
         </div>
