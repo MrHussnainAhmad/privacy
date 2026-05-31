@@ -2,19 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import DeletionApp from "@/models/DeletionApp";
 import DeletionRequest from "@/models/DeletionRequest";
-import { checkRateLimit } from "@/lib/deletion/rate-limit";
 import { createRequestId, createVerificationToken, hashToken, maskEmail } from "@/lib/deletion/token";
 import { validateDeletionPayload } from "@/lib/deletion/validation";
 import { processDeletionRequest } from "@/lib/deletion/orchestrator";
 import { sendDeletionVerificationEmail } from "@/lib/deletion/email";
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  const limit = checkRateLimit(`deletion:request:${ip}`, 15 * 60 * 1000, 5);
-  if (!limit.ok) {
-    return NextResponse.json({ success: true, status: "pending_verification", message: "If this account exists, we sent verification instructions." });
-  }
-
   try {
     const body = await req.json();
     const { appId, email } = validateDeletionPayload(body as Record<string, unknown>);
