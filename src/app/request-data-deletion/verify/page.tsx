@@ -1,11 +1,12 @@
 import { Metadata } from "next";
-
-type PageProps = {
-  searchParams: Promise<{ rid?: string; token?: string }>;
-};
+import PublicShell from "@/components/site/PublicShell";
 
 export const metadata: Metadata = {
   title: "Deletion Verification",
+};
+
+type PageProps = {
+  searchParams: Promise<{ rid?: string; token?: string }>;
 };
 
 export default async function VerifyDeletionPage({ searchParams }: PageProps) {
@@ -13,12 +14,14 @@ export default async function VerifyDeletionPage({ searchParams }: PageProps) {
 
   if (!rid || !token) {
     return (
-      <div className="min-h-screen bg-slate-50 px-6 py-16">
-        <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-8">
-          <h1 className="text-2xl font-bold text-slate-900">Deletion Verification</h1>
-          <p className="mt-4 text-slate-700">Invalid verification link.</p>
+      <PublicShell>
+        <div className="px-4 sm:px-6 py-12 sm:py-16">
+          <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Deletion Verification</h1>
+            <p className="mt-4 text-slate-700 dark:text-slate-300">Invalid verification link.</p>
+          </div>
         </div>
-      </div>
+      </PublicShell>
     );
   }
 
@@ -43,17 +46,19 @@ export default async function VerifyDeletionPage({ searchParams }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-6 py-16">
-      <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-8">
-        <h1 className="text-2xl font-bold text-slate-900">Deletion Verification</h1>
-        <p className="mt-4 text-slate-700">{state}</p>
-        {reason && (
-          <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            Why it failed: {reason}
-          </p>
-        )}
-        <p className="mt-3 text-sm text-slate-500">Reference ID: {rid}</p>
+    <PublicShell>
+      <div className="px-4 sm:px-6 py-12 sm:py-16">
+        <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Deletion Verification</h1>
+          <p className="mt-4 text-slate-700 dark:text-slate-300">{state}</p>
+          {reason && (
+            <p className="mt-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-sm text-amber-900 dark:text-amber-200">
+              Why it failed: {reason}
+            </p>
+          )}
+          <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 break-all">Reference ID: {rid}</p>
+        </div>
       </div>
-    </div>
+    </PublicShell>
   );
 }

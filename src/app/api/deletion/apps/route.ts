@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import DeletionApp from "@/models/DeletionApp";
 
+export const revalidate = 60;
+
 export async function GET() {
   await dbConnect();
   const apps = await DeletionApp.find({ isActive: true })
@@ -9,5 +11,12 @@ export async function GET() {
     .sort({ appName: 1 })
     .lean();
 
-  return NextResponse.json({ success: true, apps });
+  return NextResponse.json(
+    { success: true, apps },
+    {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+      },
+    }
+  );
 }
