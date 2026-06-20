@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Smartphone, Sparkles } from "lucide-react";
+import Image from "next/image";
+import { ArrowUpRight, Sparkles } from "lucide-react";
 
 interface ProjectCard {
   _id: string;
@@ -46,8 +47,14 @@ export default function ProjectsGrid({ projects }: ProjectsGridProps) {
                   backgroundSize: "16px 16px",
                 }}
               ></div>
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white dark:bg-slate-900 rounded-2xl shadow-sm flex items-center justify-center text-slate-400 dark:text-slate-500 group-hover:scale-110 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all duration-300">
-                <Smartphone size={28} />
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white dark:bg-slate-900 rounded-2xl shadow-sm flex items-center justify-center p-2 group-hover:scale-110 transition-all duration-300">
+                <Image
+                  src="/logo.png"
+                  alt="AppsByHussnain"
+                  width={48}
+                  height={48}
+                  className="h-full w-full object-contain"
+                />
               </div>
             </div>
             <div className="p-5 sm:p-8 flex-1 flex flex-col">
@@ -72,8 +79,14 @@ export default function ProjectsGrid({ projects }: ProjectsGridProps) {
             className="flex flex-col bg-slate-50 dark:bg-slate-900 rounded-2xl overflow-hidden border border-dashed border-slate-200 dark:border-slate-700"
           >
             <div className="h-36 sm:h-48 bg-slate-100 dark:bg-slate-800 flex items-center justify-center relative overflow-hidden">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white dark:bg-slate-900 rounded-2xl shadow-sm flex items-center justify-center text-slate-300 dark:text-slate-600">
-                <Smartphone size={28} />
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white dark:bg-slate-900 rounded-2xl shadow-sm flex items-center justify-center p-2 opacity-50">
+                <Image
+                  src="/logo.png"
+                  alt="AppsByHussnain"
+                  width={48}
+                  height={48}
+                  className="h-full w-full object-contain"
+                />
               </div>
             </div>
             <div className="p-5 sm:p-8 flex-1 flex flex-col">

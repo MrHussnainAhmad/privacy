@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { cache } from "react";
 import { Mail, Linkedin, Gamepad2, Smartphone, Globe, CheckCircle2 } from "lucide-react";
 import dbConnect from "@/lib/db";
@@ -165,8 +166,8 @@ export default async function Home() {
                 ) : (
                     <div className="grid">
                         <div className="col-span-full py-16 sm:py-20 bg-slate-50 dark:bg-slate-900 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-center px-4">
-                            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 mb-4">
-                                <Smartphone size={32} />
+                            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center p-3 mb-4">
+                                <Image src="/logo.png" alt="AppsByHussnain" width={40} height={40} className="h-full w-full object-contain" />
                             </div>
                             <h3 className="text-lg font-semibold text-slate-900 dark:text-white">No Projects Yet</h3>
                             <p className="text-slate-500 dark:text-slate-400 max-w-sm mt-2">Projects added via the admin dashboard will appear here automatically.</p>

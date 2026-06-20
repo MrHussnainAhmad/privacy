@@ -1,9 +1,14 @@
-import dbConnect from "@/lib/db";
-import Project, { IProject } from "@/models/Project";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import PublicShell from "@/components/site/PublicShell";
+import dynamic from "next/dynamic";
+import { getPrivacyPageData } from "@/lib/privacy/data";
+import { getWatermarkStyle } from "@/lib/privacy/watermark";
+
+const PrintPolicyButton = dynamic(() => import("@/components/privacy/PrintPolicyButton"), {
+  loading: () => <div className="h-10 w-32 animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800" />,
+});
 
 export const revalidate = 300;
 
@@ -13,39 +18,62 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  await dbConnect();
-  const project = (await Project.findOne({ slug }).select({ projectName: 1 }).lean()) as unknown as IProject | null;
+  const { project } = await getPrivacyPageData(slug);
 
   if (!project) {
     return { title: "Privacy Policy Not Found" };
   }
 
-  const name = project.projectName;
   return {
-    title: `${name} - Privacy Policy`,
-    description: `Privacy Policy for ${name}`,
+    title: `${project.projectName} - Privacy Policy`,
+    description: `Privacy Policy for ${project.projectName}`,
   };
 }
 
 export default async function PrivacyPolicyPage({ params }: Props) {
   const { slug } = await params;
-  await dbConnect();
-  const project = (await Project.findOne({ slug }).lean()) as unknown as IProject | null;
+  const { project, logoUrl } = await getPrivacyPageData(slug);
 
   if (!project) {
     notFound();
   }
 
   const { projectName, privacyPolicyContent, updatedAt } = project;
+  const isRemoteLogo = logoUrl.startsWith("http");
+  const watermarkStyle = getWatermarkStyle(slug, logoUrl);
 
   return (
-    <PublicShell>
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 py-10 sm:py-12 md:py-20">
-        <header className="mb-8 sm:mb-10 text-center border-b border-slate-200 dark:border-slate-800 pb-6 sm:pb-8">
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl break-words">
+    <div className="privacy-page relative min-h-[60vh]">
+      <div
+        className="privacy-watermark pointer-events-none fixed inset-0 print:hidden"
+        style={watermarkStyle}
+        aria-hidden="true"
+      />
+
+      <div className="privacy-print-content relative z-10 mx-auto max-w-3xl px-4 sm:px-6 py-10 sm:py-12 md:py-20">
+        <div className="mb-6 flex justify-end print:hidden">
+          <PrintPolicyButton />
+        </div>
+
+        <header className="privacy-print-header mb-8 sm:mb-10 border-b border-slate-200 pb-6 sm:pb-8 text-center dark:border-slate-800">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white p-2 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700 sm:h-20 sm:w-20">
+            <Image
+              src={logoUrl}
+              alt={`${projectName} logo`}
+              width={72}
+              height={72}
+              priority
+              sizes="80px"
+              unoptimized={isRemoteLogo}
+              className="h-full w-full object-contain"
+            />
+          </div>
+          <h1 className="break-words text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-3xl md:text-4xl">
             {projectName}
           </h1>
-          <p className="mt-3 sm:mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400 font-medium">Privacy Policy</p>
+          <p className="mt-3 text-base font-medium text-slate-600 dark:text-slate-400 sm:mt-4 sm:text-lg">
+            Privacy Policy
+          </p>
           <div className="mt-2 flex justify-center text-sm text-slate-400 dark:text-slate-500">
             <span>Last Updated: {new Date(updatedAt).toLocaleDateString()}</span>
           </div>
@@ -55,10 +83,12 @@ export default async function PrivacyPolicyPage({ params }: Props) {
           <ReactMarkdown>{privacyPolicyContent}</ReactMarkdown>
         </article>
 
-        <footer className="mt-12 sm:mt-16 border-t border-slate-200 dark:border-slate-800 pt-6 sm:pt-8 text-center text-sm text-slate-400 dark:text-slate-500">
-          <p>&copy; {new Date().getFullYear()} {projectName}. All rights reserved.</p>
+        <footer className="privacy-print-footer mt-12 border-t border-slate-200 pt-6 text-center text-sm text-slate-400 dark:border-slate-800 dark:text-slate-500 sm:mt-16 sm:pt-8">
+          <p>
+            &copy; {new Date().getFullYear()} {projectName}. All rights reserved.
+          </p>
         </footer>
       </div>
-    </PublicShell>
+    </div>
   );
 }

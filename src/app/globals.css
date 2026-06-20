@@ -108,3 +108,52 @@ body {
     transform: translate3d(-6%, 3%, 0) rotate(0deg);
   }
 }
+
+@media print {
+  nav,
+  .print\:hidden,
+  .privacy-watermark {
+    display: none !important;
+  }
+
+  body,
+  .dark body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .privacy-page {
+    min-height: auto;
+  }
+
+  .privacy-print-content {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .privacy-print-header img {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .privacy-print-content .prose,
+  .privacy-print-content .prose * {
+    color: #000 !important;
+  }
+
+  .privacy-print-content .prose a {
+    text-decoration: underline;
+  }
+
+  .privacy-print-header,
+  .privacy-print-footer {
+    border-color: #ccc !important;
+  }
+
+  .privacy-print-header h1,
+  .privacy-print-header p,
+  .privacy-print-footer p {
+    color: #000 !important;
+  }
+}
