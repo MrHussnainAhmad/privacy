@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /deleteaccountrequests
+Disallow: /api/
+Disallow: /auth/
+
+Sitemap: https://appsbyhussnain.vercel.app/sitemap.xml
